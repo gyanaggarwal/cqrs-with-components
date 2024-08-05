@@ -35,17 +35,14 @@ fn all_employees(_req: Request, _param: Params) -> anyhow::Result<impl IntoRespo
                 row.get::<&str>("Id")
                     .ok_or_else(|| anyhow!("Employees.Id not present"))?,
             );
-            println!("id {}", id);
             let name = String::from(
                 row.get::<&str>("Name")
                     .ok_or_else(|| anyhow!("Name not present"))?,
             );
-            println!("name {}", name);
             let city = String::from(
                 row.get::<&str>("City")
                     .ok_or_else(|| anyhow!("Addresses.City not present"))?,
             );
-            println!("city {}", city);
             anyhow::Ok(EmployeeListModel { id, name, city })
         })
         .filter(|item| item.is_ok())

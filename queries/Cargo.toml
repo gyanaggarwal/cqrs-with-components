@@ -1,0 +1,19 @@
+[package]
+name = "queries"
+authors = ["Gyanendra Aggarwal <gyanendra.aggarwal@gmail.com>"]
+description = "query component"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1"
+spin-sdk = "3.0.1"
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.117"
+uuid = { version = "1.8.0", features = ["v4"] }
+tracing = "0.1.40"
+
+[workspace]

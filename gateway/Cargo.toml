@@ -1,0 +1,16 @@
+[package]
+name = "gateway"
+authors = ["Gyanendra Aggarwal <gyanendra.aggarwal@gmail.com>"]
+description = "gateway to cqrs"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1"
+spin-sdk = "3.0.1"
+tracing = "0.1.40"
+
+[workspace]
