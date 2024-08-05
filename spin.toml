@@ -1,0 +1,45 @@
+spin_manifest_version = 2
+
+[application]
+name = "cqrs-with-components"
+version = "0.1.0"
+authors = ["Gyanendra Aggarwal <gyanendra.aggarwal@gmail.com>"]
+description = "cqrs with gateway queries command "
+
+[[trigger.http]]
+route = "/..."
+component = "gateway"
+
+[component.gateway]
+source = "gateway/target/wasm32-wasi/release/gateway.wasm"
+allowed_outbound_hosts = ["https://*.spin.internal"]
+[component.gateway.build]
+command = "cargo build --target wasm32-wasi --release"
+workdir = "gateway"
+watch = ["src/**/*.rs", "Cargo.toml"]
+
+[[trigger.http]]
+route = { private = true}
+component = "commands"
+
+[component.commands]
+source = "commands/target/wasm32-wasi/release/commands.wasm"
+allowed_outbound_hosts = []
+sqlite_databases = ["default"]
+[component.commands.build]
+command = "cargo build --target wasm32-wasi --release"
+workdir = "commands"
+watch = ["src/**/*.rs", "Cargo.toml"]
+
+[[trigger.http]]
+route = {private = true}
+component = "queries"
+
+[component.queries]
+source = "queries/target/wasm32-wasi/release/queries.wasm"
+allowed_outbound_hosts = []
+sqlite_databases = ["default"]
+[component.queries.build]
+command = "cargo build --target wasm32-wasi --release"
+workdir = "queries"
+watch = ["src/**/*.rs", "Cargo.toml"]
