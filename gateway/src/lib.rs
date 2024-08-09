@@ -59,7 +59,17 @@ fn parse_result(res: Response) -> Result<Response> {
 
 #[tracing::instrument(name="create_employee", skip_all)]
 async fn create_employee(req: Request, _: Params) -> Result<impl IntoResponse> {
-    let url = format!("{}/create", COMMAND_ROOT_URL);
+    let url = format!("{}/create_employee", COMMAND_ROOT_URL);
+    execute_command(url, req.header("content-type"), Some(req.body().to_vec())).await
+}
+
+async fn create_location(req: Request, _: Params) -> Result<impl IntoResponse> {
+    let url = format!("{}/create_location", COMMAND_ROOT_URL);
+    execute_command(url, req.header("content-type"), Some(req.body().to_vec())).await
+}
+
+async fn create_person(req: Request, _: Params) -> Result<impl IntoResponse> {
+    let url = format!("{}/create_person", COMMAND_ROOT_URL);
     execute_command(url, req.header("content-type"), Some(req.body().to_vec())).await
 }
 
@@ -68,7 +78,25 @@ async fn update_employee_by_id(req: Request, params: Params) -> Result<impl Into
     let Some(id) = params.get("id") else {
         return Ok(Response::new(400, ()));
     };
-    let url = format!("{}/update/{}", COMMAND_ROOT_URL, id);
+    let url = format!("{}/update_employee/{}", COMMAND_ROOT_URL, id);
+    let ct = req.header("content-type");
+    execute_command(url, ct, Some(req.body().to_vec())).await
+}
+
+async fn update_location_by_id(req: Request, params: Params) -> Result<impl IntoResponse> {
+    let Some(id) = params.get("lid") else {
+        return Ok(Response::new(400, ()));
+    };
+    let url = format!("{}/update_location/{}", COMMAND_ROOT_URL, id);
+    let ct = req.header("content-type");
+    execute_command(url, ct, Some(req.body().to_vec())).await
+}
+
+async fn update_person_by_id(req: Request, params: Params) -> Result<impl IntoResponse> {
+    let Some(id) = params.get("pid") else {
+        return Ok(Response::new(400, ()));
+    };
+    let url = format!("{}/update_person/{}", COMMAND_ROOT_URL, id);
     let ct = req.header("content-type");
     execute_command(url, ct, Some(req.body().to_vec())).await
 }
@@ -78,7 +106,15 @@ async fn delete_employee_by_id(_req: Request, params: Params) -> Result<impl Int
     let Some(id) = params.get("id") else {
         return Ok(Response::new(400, ()));
     };
-    let url = format!("{}/delete/{}", COMMAND_ROOT_URL, id);
+    let url = format!("{}/delete_employee/{}", COMMAND_ROOT_URL, id);
+    execute_command(url, None, None).await
+}
+
+async fn delete_person_by_id(_req: Request, params: Params) -> Result<impl IntoResponse> {
+    let Some(id) = params.get("pid") else {
+        return Ok(Response::new(400, ()));
+    };
+    let url = format!("{}/delete_person/{}", COMMAND_ROOT_URL, id);
     execute_command(url, None, None).await
 }
 
@@ -108,5 +144,13 @@ fn handle_gateway(req: Request) -> anyhow::Result<impl IntoResponse> {
     router.post_async("/employees", create_employee);
     router.put_async("/employees/:id", update_employee_by_id);
     router.delete_async("/employees/:id", delete_employee_by_id);
+
+    router.post_async("/locations", create_location);
+    router.put_async("/locations/:lid", update_location_by_id);
+
+    router.post_async("/persons", create_person);
+    router.put_async("/persons/:pid", update_person_by_id);
+    router.delete_async("/persons/:pid", delete_person_by_id);
+
     Ok(router.handle(req))
 }

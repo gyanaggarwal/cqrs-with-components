@@ -25,3 +25,22 @@ It has 3 components
        ----------------------            ----------------------
              queries                           commnads
        ----------------------            ----------------------
+
+CREATE TABLE Persons (
+    Pid VARCHAR(36) NOT NULL, 
+    FirstName TEXT NOT NULL, 
+    LastName TEXT NOT NULL,
+    Plid VARCHAR(36) NOT NULL,
+    PRIMARY KEY (Pid),
+    FOREIGN KEY (Plid) REFERENCES Locations (Lid)
+);
+
+CREATE TABLE Locations (
+    Lid VARCHAR(36) NOT NULL,
+    Street VARCHAR(50) NOT NULL,
+    Zip VARCHAR(10) NOT NULL,
+    City VARCHAR(50) NOT NULL,
+    PRIMARY KEY (Lid)
+);
+
+There is many-to-one relationship Persons and Locations

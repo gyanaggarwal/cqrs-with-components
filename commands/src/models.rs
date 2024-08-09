@@ -24,6 +24,22 @@ pub struct CreateAddressModel {
     pub city: String,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct CreatePersonModel {
+    #[serde(rename = "firstName")]
+    pub first_name: String,
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+    pub plid: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateLocationModel {
+    pub street: String,
+    pub zip: String,
+    pub city: String,
+}
+
 /// API Model for updating an Employee
 #[derive(Debug, Deserialize)]
 pub struct UpdateEmployeeModel {
@@ -49,6 +65,22 @@ pub struct UpdateAddressModel {
     pub zip: String,
 
     /// city
+    pub city: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdatePersonModel {
+    #[serde(rename = "firstName")]
+    pub first_name: String,
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+    pub plid: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateLocationModel {
+    pub street: String,
+    pub zip: String,
     pub city: String,
 }
 
@@ -118,4 +150,40 @@ pub struct AddressUpdatedModel {
 
     /// city
     pub city: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct PersonCreatedModel {
+    pub pid: String,
+    #[serde(rename = "firstName")]
+    pub first_name: String,
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+    pub plid: String    
+}
+
+#[derive(Debug, Serialize)]
+pub struct LocationCreatedModel {
+    pub lid: String,
+    pub street: String,
+    pub zip: String,
+    pub city: String
+}
+
+#[derive(Debug, Serialize)]
+pub struct PersonUpdatedModel {
+    pub pid: String,
+    #[serde(rename = "firstName")]
+    pub first_name: String,
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+    pub plid: String 
+}
+
+#[derive(Debug, Serialize)]
+pub struct LocationUpdatedModel {
+    pub lid: String,
+    pub street: String,
+    pub zip: String,
+    pub city: String
 }
