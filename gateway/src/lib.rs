@@ -5,14 +5,13 @@ use spin_sdk::http::{
 };
 use spin_sdk::http_component;
 
-const QUERY_ROOT_URL: &str = "https://queries.spin.internal/employees";
+const QUERY_ROOT_URL: &str = "https://queries.spin.internal";
 const COMMAND_ROOT_URL: &str = "https://commands.spin.internal";
 
 #[tracing::instrument(name="execute_command", skip_all)]
 async fn execute_command(url: String,
                          content_type: Option<&HeaderValue>,
                          payload: Option<Vec<u8>>) -> Result<Response> {
-    println!("gateway:execute_command url {}", url);
     let req: Request = match content_type {
         Some(ct) => RequestBuilder::new(spin_sdk::http::Method::Post, url)
             .header("Accept", "application/json")
@@ -122,7 +121,7 @@ async fn delete_person_by_id(_req: Request, params: Params) -> Result<impl IntoR
 async fn get_employee_by_id(_req: Request, params: Params) -> Result<impl IntoResponse> {
     match params.get("id") {
         Some(id) => {
-            let url = format!("{}/{}", QUERY_ROOT_URL, id);
+            let url = format!("{}/employees/{}", QUERY_ROOT_URL, id);
             execute_query(url.as_str()).await
         }
         None => Ok(Response::new(200, ())),
@@ -131,26 +130,66 @@ async fn get_employee_by_id(_req: Request, params: Params) -> Result<impl IntoRe
 
 #[tracing::instrument(name="get_employees", skip_all)]
 async fn get_employees(_req: Request, _: Params) -> Result<impl IntoResponse> {
-    execute_query(QUERY_ROOT_URL).await
+    let url = format!("{}/employees", QUERY_ROOT_URL);
+    execute_query(url.as_str()).await
+}
+
+#[tracing::instrument(name="get_locations", skip_all)]
+async fn get_locations(_req: Request, _: Params) -> Result<impl IntoResponse> {
+    let url = format!("{}/locations", QUERY_ROOT_URL);
+    execute_query(url.as_str()).await
+}
+
+#[tracing::instrument(name="get_persons", skip_all)]
+async fn get_persons(_req: Request, _: Params) -> Result<impl IntoResponse> {
+    let url = format!("{}/persons", QUERY_ROOT_URL);
+    execute_query(url.as_str()).await
+}
+
+#[tracing::instrument(name="get_location_by_id", skip_all)]
+async fn get_location_by_id(_req: Request, params: Params) -> Result<impl IntoResponse> {
+    match params.get("lid") {
+        Some(lid) => {
+            let url = format!("{}/locations/{}", QUERY_ROOT_URL, lid);
+            execute_query(url.as_str()).await
+        }
+        None => Ok(Response::new(200, ())),
+    }
+}
+
+#[tracing::instrument(name="get_person_by_id", skip_all)]
+async fn get_person_by_id(_req: Request, params: Params) -> Result<impl IntoResponse> {
+    match params.get("pid") {
+        Some(pid) => {
+            let url = format!("{}/persons/{}", QUERY_ROOT_URL, pid);
+            execute_query(url.as_str()).await
+        }
+        None => Ok(Response::new(200, ())),
+    }
 }
 
 #[tracing::instrument(name="handle_gateway", skip_all)]
 #[http_component]
 fn handle_gateway(req: Request) -> anyhow::Result<impl IntoResponse> {
     let mut router = Router::default();
-    router.get_async("/employees", get_employees);
-    router.get_async("/employees/:id", get_employee_by_id);
 
-    router.post_async("/employees", create_employee);
-    router.put_async("/employees/:id", update_employee_by_id);
+    router.get_async("/employees",        get_employees);
+    router.get_async("/employees/:id",    get_employee_by_id);
+    router.get_async("/locations",        get_locations);
+    router.get_async("/locations/:lid",   get_location_by_id);
+    router.get_async("/persons",          get_persons);
+    router.get_async("/persons/:pid",     get_person_by_id);
+ 
+    router.post_async("/employees",       create_employee);
+    router.put_async("/employees/:id",    update_employee_by_id);
     router.delete_async("/employees/:id", delete_employee_by_id);
 
-    router.post_async("/locations", create_location);
-    router.put_async("/locations/:lid", update_location_by_id);
+    router.post_async("/locations",       create_location);
+    router.put_async("/locations/:lid",   update_location_by_id);
 
-    router.post_async("/persons", create_person);
-    router.put_async("/persons/:pid", update_person_by_id);
-    router.delete_async("/persons/:pid", delete_person_by_id);
+    router.post_async("/persons",         create_person);
+    router.put_async("/persons/:pid",     update_person_by_id);
+    router.delete_async("/persons/:pid",  delete_person_by_id);
 
     Ok(router.handle(req))
 }
